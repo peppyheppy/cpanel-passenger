@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+#
+#  Created on 2009-5-11.
+#  Copyright (c) 2009. All rights reserved.
+
+require File.expand_path(File.dirname(__FILE__) + "/../lib/cpanel_passenger")
+
+require "cpanel_passenger/cli"
+
+CpanelPassenger::CLI.execute(STDOUT, ARGV)
