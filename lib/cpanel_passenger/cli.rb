@@ -9,7 +9,7 @@ module CpanelPassenger
         :username     => nil,
         :path     => nil
       }
-      mandatory_options = %w( -u -p )
+      mandatory_options = %w( username path )
 
       parser = OptionParser.new do |opts|
         opts.banner = <<-BANNER.gsub(/^          /,'')
