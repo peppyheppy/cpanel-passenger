@@ -1,6 +1,4 @@
-History.txt
 Manifest.txt
-PostInstall.txt
 README.rdoc
 Rakefile
 bin/cpanel_passenger

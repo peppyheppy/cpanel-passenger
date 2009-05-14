@@ -6,8 +6,6 @@ require File.dirname(__FILE__) + '/lib/cpanel_passenger'
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
 $hoe = Hoe.new('cpanel-passenger', CpanelPassenger::VERSION) do |p|
   p.developer('Paul Hepworth', 'paul@peppyheppy.com')
-  p.post_install_message = 'PostInstall.txt' # TODO remove if post-install message not required
-  p.rubyforge_name       = p.name # TODO this is default value
   # p.extra_deps         = [
   #   ['activesupport','>= 2.0.2'],
   # ]
