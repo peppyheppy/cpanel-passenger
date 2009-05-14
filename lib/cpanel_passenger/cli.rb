@@ -54,6 +54,6 @@ module CpanelPassenger
       `/scripts/ensure_vhost_includes --user=#{username}`    
 
       stdout.puts "* Done. You can view the config changes in #{path_to_config}"
-
+    end
   end
 end
