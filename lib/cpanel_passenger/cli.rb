@@ -5,12 +5,11 @@ module CpanelPassenger
   class CLI
     def self.execute(stdout, arguments=[])
 
-      # NOTE: the option -p/--path= is given as an example, and should be replaced in your application.
-
       options = {
-        :path     => '~'
+        :username     => nil,
+        :path     => nil
       }
-      mandatory_options = %w(  )
+      mandatory_options = %w( -u -p )
 
       parser = OptionParser.new do |opts|
         opts.banner = <<-BANNER.gsub(/^          /,'')
@@ -22,9 +21,10 @@ module CpanelPassenger
         BANNER
         opts.separator ""
         opts.on("-p", "--path=PATH", String,
-                "This is a sample message.",
-                "For multiple lines, add more strings.",
+                "The absolute path to your rails application root (ex: /home/username/blog)",
                 "Default: ~") { |arg| options[:path] = arg }
+        opts.on("-u", "--username=USERNAME", String, 
+                "Your cpanel account username (ex: peppyheppy)") { |arg| options[:username] = arg.strip }
         opts.on("-h", "--help",
                 "Show this help message.") { stdout.puts opts; exit }
         opts.parse!(arguments)
@@ -34,43 +34,26 @@ module CpanelPassenger
         end
       end
 
-      path = options[:path]
+      username = options[:username]
+      rails_app_path = options[:path]
 
-      # do stuff
-      # get the user name
-      print "Enter your account username (ex: peppyheppy): "
-      username = gets.strip
-      raise "Username is required!" if username.strip.nil?
-
-      # get the path to the rails app's public dir
-      print "Enter the name of the Rails app locatted in /home/#{username} (ex: blog in /home/#{username}/blog): "
-      rails_app_path = "/home/#{username}/#{gets.strip}"
+      stdout.puts "* Setting up Rails app in Apache config for user"
       raise "Path is required!" unless File.directory?(rails_app_path) or File.directory?("#{rails_app_path}/public")
+      raise "Script needed for overriding or appending vhost includes is not found, do you have cpanel installed?" unless File.exists?("/scripts/ensure_vhost_includes")
+      
+      stdout.puts "* Fetching info from httpd.conf"
+      path_to_config = File.new("/usr/local/apache/conf/httpd.conf").readlines.grep(/userdata\/.*\/#{username}/).first.strip[/\/usr\/.*[*]/].chop + "rails.conf"
 
-      stdout.puts "Setting up Rails app in Apache config for user"
-      if File.directory?("/home/#{username.strip}")
-        if File.exists?("/scripts/ensure_vhost_includes")
-          stdout.puts "Fetching info from httpd.conf"
-          path_to_config = File.new("/usr/local/apache/conf/httpd.conf").readlines.grep(/userdata\/.*\/#{username}/).first.strip[/\/usr\/.*[*]/].chop + "rails.conf"
+      stdout.puts "* Creating configs for #{username}"
+      file = File.open(path_to_config,  "w+")
+      file.write "# line added by cpanel passenger script\n"
+      file.write "DocumentRoot #{rails_app_path}/public"
+      file.close    
 
-          stdout.puts "Creating configs for #{username}"
-          file = File.open(path_to_config,  "w+")
-          file.write "# line added by cpanel passenger script\n"
-          file.write "DocumentRoot #{rails_app_path}/public"
-          file.close    
+      stdout.puts "* Enabling the configs for #{username}"
+      `/scripts/ensure_vhost_includes --user=#{username}`    
 
-          stdout.puts "Enabling the configs for #{username}"
-          `/scripts/ensure_vhost_includes --user=#{username}`    
+      stdout.puts "* Done. You can view the config changes in #{path_to_config}"
 
-          stdout.puts "Done. You can view the config changes in #{path_to_config}"
-        else
-          raise "Script needed for overriding or appending vhost includes is not found, do you have cpanel installed?"
-        end
-
-      else
-       raise "The user does not exist on the system."
-      end
-   
-    end
   end
 end

@@ -4,9 +4,8 @@ require File.dirname(__FILE__) + '/lib/cpanel_passenger'
 
 # Generate all the Rake tasks
 # Run 'rake -T' to see list of generated tasks (from gem root directory)
-$hoe = Hoe.new('cpanel_passenger', CpanelPassenger::VERSION) do |p|
-  p.developer('FIXME full name', 'FIXME email')
-  p.changes              = p.paragraphs_of("History.txt", 0..1).join("\n\n")
+$hoe = Hoe.new('cpanel-passenger', CpanelPassenger::VERSION) do |p|
+  p.developer('Paul Hepworth', 'paul@peppyheppy.com')
   p.post_install_message = 'PostInstall.txt' # TODO remove if post-install message not required
   p.rubyforge_name       = p.name # TODO this is default value
   # p.extra_deps         = [

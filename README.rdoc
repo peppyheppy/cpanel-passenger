@@ -1,32 +1,33 @@
 = cpanel_passenger
 
-* http://github.com/#{github_username}/#{project_name}
+* http://github.com/peppyheppy/cpanel-passenger
 
 == DESCRIPTION:
 
-FIX (describe your package)
+This gem consists of a single script that enables a cpanel account to run a Ruby on Rails App. Many more improvements could/should be made to handle more cases.
 
 == FEATURES/PROBLEMS:
 
-* FIX (list of features or problems)
+* It currently configures a Passenger enabled Apache web server for the provided rails app
+* It doesn't do anything else at the moment.
 
 == SYNOPSIS:
 
-  FIX (code sample of usage)
+cpanel-passenger --username=peppyheppy --path=/home/peppyheppy/rails_app
 
 == REQUIREMENTS:
 
-* FIX (list of requirements)
+Must be run as root since it will modify the Apache httpd.conf files.
 
 == INSTALL:
 
-* FIX (sudo gem install, anything else)
+sudo gem install peppyheppy-cpanel-passenger
 
 == LICENSE:
 
 (The MIT License)
 
-Copyright (c) 2009 FIXME full name
+Copyright (c) 2009 Paul Hepworth
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
