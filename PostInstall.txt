@@ -1,7 +1,1 @@
-
-For more information on cpanel_passenger, see http://cpanel_passenger.rubyforge.org
-
-NOTE: Change this information in PostInstall.txt 
-You can also delete it if you don't want it.
-
-
+Thanks and good luck! -peppyheppy
