@@ -7,7 +7,9 @@ module CpanelPassenger
 
       options = {
         :username     => nil,
-        :path     => nil
+        :path     => nil,
+        :maxpoolsize => nil,
+        :poolidletime => nil                
       }
       mandatory_options = %w( username path )
 
@@ -21,10 +23,13 @@ module CpanelPassenger
         BANNER
         opts.separator ""
         opts.on("-p", "--path=PATH", String,
-                "The absolute path to your rails application root (ex: /home/username/blog)",
-                "Default: ~") { |arg| options[:path] = arg }
+                "The absolute path to your rails application root (ex: /home/username/blog)") { |arg| options[:path] = arg }
         opts.on("-u", "--username=USERNAME", String, 
                 "Your cpanel account username (ex: peppyheppy)") { |arg| options[:username] = arg.strip }
+        opts.on("-s", "--max-pool-size=MAXPOOLSIZE", String, 
+          "Value for PassengerMaxPoolSize which is used for setting the max number of application instances") { |arg| options[:maxpoolsize] = arg.strip }
+        opts.on("-t", "--pool-idle-time=POOLIDLETIME", String, 
+          "Value for PassengerPoolIdleTime which sets the idle time for an application instance before it shuts down") { |arg| options[:poolidletime] = arg.strip }
         opts.on("-h", "--help",
                 "Show this help message.") { stdout.puts opts; exit }
         opts.parse!(arguments)
@@ -48,8 +53,14 @@ module CpanelPassenger
       file = File.open(path_to_config,  "w+")
       file.write "# line added by cpanel passenger script\n"
       file.write "DocumentRoot #{rails_app_path}/public"
+      # optionsal parameters
+      unless options[:maxpoolsize].nil?
+        file.write "PassengerMaxPoolSize #{options[:maxpoolsize]}" if options[:maxpoolsize].to_i > 0
+      end
+      unless options[:poolidletime].nil?
+        file.write "PassengerPoolIdleTime #{options[:poolidletime]}" if options[:poolidletime].to_i > 0
+      end
       file.close    
-
       stdout.puts "* Enabling the configs for #{username}"
       `/scripts/ensure_vhost_includes --user=#{username}`    
 
