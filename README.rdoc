@@ -4,16 +4,26 @@
 
 == DESCRIPTION:
 
-This gem consists of a single script that enables a cpanel account to run a Ruby on Rails App. Many more improvements could/should be made to handle more cases.
+This gem consists of a single script that enables a cpanel account to run a Ruby on Rails App. Many more improvements could/should be made to handle more cases. 
+
+Originally I was going to do a lot more with this, but then decided that I didn't need to for my needs.
 
 == FEATURES/PROBLEMS:
 
 * It currently configures a Passenger enabled Apache web server for the provided rails app
-* It doesn't do anything else at the moment.
+* It doesn't do anything else at the moment
 
 == SYNOPSIS:
 
+- Generate/Setup Config (simple)
 cpanel-passenger --username=peppyheppy --path=/home/peppyheppy/rails_app
+
+- View previously generated config
+cpanel_passenger --username=peppyheppy --path=/home/peppyheppy/rails_app --show-current-config
+
+- Add Additional Custom Passenger Configurations
+cpanel-passenger --username=peppyheppy --path=/home/peppyheppy/rails_app --misc-config="PassengerMaxRequests 100,PassengerStatThrottleRate 2"
+(see http://www.modrails.com/documentation/Users guide.html for more parameters)
 
 == REQUIREMENTS:
 
