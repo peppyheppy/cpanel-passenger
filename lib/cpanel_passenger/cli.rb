@@ -1,5 +1,6 @@
 require 'optparse'
 require 'ftools'
+require 'fileutils'
       
 module CpanelPassenger
   class CLI
@@ -28,9 +29,11 @@ module CpanelPassenger
         opts.on("-c", "--show-current-config",
                 "Show the current config for an account; requires -u and -p") { |arg| options[:showcurrentconfig] = true }
         opts.on("-p", "--path=PATH", String,
-                "The absolute path to your rails application root (ex: /home/username/blog)") { |arg| options[:path] = arg }
+                "The absolute path to your rails application root (ex: /home/username/blog/current)") { |arg| options[:path] = arg }
         opts.on("-u", "--username=USERNAME", String, 
-                "Your cpanel account username (ex: peppyheppy)") { |arg| options[:username] = arg.strip }
+                "Your cpanel account username (ex: peppyhep)") { |arg| options[:username] = arg.strip }
+        opts.on("-d", "--domain=domain", String, 
+                "The domain for this username (ex: peppyheppy.com)") { |arg| options[:domain] = arg.strip }
         opts.on("-s", "--max-pool-size=SIZE", String, 
                 "Value for PassengerMaxPoolSize which is used for setting", 
                 "the max number of application instances") { |arg| options[:maxpoolsize] = arg.strip }
@@ -52,13 +55,23 @@ module CpanelPassenger
 
       username = options[:username]
       rails_app_path = options[:path]
+      apache_config_root = '/usr/local/apache/conf'
+      apache_userdata_config_root = "#{apache_config_root}/userdata/std/2"
 
       stdout.puts "* Setting up Rails app in Apache config for user"
       raise "Path is required!" unless File.directory?(rails_app_path) or File.directory?("#{rails_app_path}/public")
       raise "Script needed for overriding or appending vhost includes is not found, do you have cpanel installed?" unless File.exists?("/scripts/ensure_vhost_includes")
-      
+                       
+      unless File.directory?("#{apache_userdata_config_root}/#{username}")
+        raise "Apache is not yet configured for your virtual host configurations... please provide the domain (-d/--domain)" unless options[:domain]
+        stdout.puts "* Making required apache config dirs."
+        config_path = "#{apache_userdata_config_root}/#{username}/#{options[:domain]}"
+        FileUtils::mkdir_p(config_path)  
+        path_to_config = config_path + "/rails.conf"
+      end      
+
       stdout.puts "* Fetching info from httpd.conf"
-      path_to_config = File.new("/usr/local/apache/conf/httpd.conf").readlines.grep(/userdata\/.*\/#{username}/).first.strip[/\/usr\/.*[*]/].chop + "rails.conf"
+      path_to_config ||= File.new("/usr/local/apache/conf/httpd.conf").readlines.grep(/userdata\/.*\/#{username}/).first.strip[/\/usr\/.*[*]/].chop + "rails.conf"
 
       unless options[:showcurrentconfig]
         stdout.puts "* Creating configs for #{username}"
